@@ -15,35 +15,35 @@
 1, MultipleChoice, "Why does training on raw (unnormalized) header values work badly?", B,
 "Raw header values live on very different scales (feature dominance), which makes training unstable.",
 "Raw header values live on very different scales; the large ones dominate the gradients (feature dominance), as Experiment 1 shows.", "",
-"Raw header values are random numbers.", "Features with large values, such as the TCP acknowledgement number, dominate the training.", "The CNN cannot read integer values.", "Raw values reveal the labels to the model."
+"Raw header values are random numbers", "Large values like the ACK number dominate", "The CNN cannot process integer inputs", "Raw values reveal the labels to the model"
 2, MultipleChoice, "In Experiment 2, what happened to the model with the IP addresses (lucid_ids) when the attacker and client addresses were swapped (test_newaddr)?", D,
 "It had learned the addresses (shortcut learning), not the traffic.",
 "On test_newaddr its accuracy fell to about 40 %: the model had learned the addresses (shortcut learning), not the traffic.", "",
-"Its accuracy stayed at about 100 %.", "Its accuracy rose, because it saw new addresses.", "It could not be evaluated on test_newaddr.", "Its accuracy fell to about 40 %: it had memorised the addresses."
+"Its accuracy stayed at about 100 %", "Its accuracy rose with the new addresses", "It could not be evaluated on that split", "Its accuracy dropped to about 40 %"
 3, MultipleChoice, "In Experiment 3, how did n = 3 packets per flow compare with n = 100?", A,
 "Three packets cut away the part of the flow that shows the attack.",
 "With n = 3 the accuracy was about 79 % against almost 100 % for n = 100: too few packets cut away the part of the flow that shows the attack.", "",
-"n = 3 was clearly worse: about 79 % accuracy against almost 100 %.", "Both gave the same accuracy.", "n = 3 was better, because it needs less data.", "n = 100 could not be trained on one CPU."
+"n = 3 was worse: about 79 % vs. 100 %", "Both reached almost the same accuracy", "n = 3 was better, as it needs less data", "n = 100 could not be trained on one CPU"
 4, MultipleChoice, "In Experiment 4, how did the SYN threshold detector do against the distributed attack of 50 bots?", C,
-"Its accuracy of about 50 % on a balanced test set means it flagged nothing.",
-"Its accuracy of about 50 % means it flagged nothing: every bot stayed under the per-source threshold.", "",
-"It flagged almost every flow of the attack.", "It flagged about half of the attack flows.", "It flagged nothing: every bot stayed under the per-source threshold.", "It blocked the victim instead of the bots."
+"An accuracy of about 50 % on a balanced test set and an F1 score of 0 mean that it flagged nothing.",
+"An accuracy of about 50 % and an F1 score of 0 mean that it flagged nothing: every bot stayed under the per-source threshold.", "",
+"It flagged almost every attack flow", "It flagged about half of the attack flows", "It flagged none: no bot reached its limit", "It blocked the victim instead of the bots"
 5, MultipleChoice, "What does permutation importance measure?", B,
 "A feature whose shuffling hurts the accuracy is one the model relies on.",
 "Permutation importance shuffles one feature at a time and measures the drop in accuracy (Experiment 5).", "",
-"How often a feature appears in the samples.", "How much the accuracy drops when the values of one feature are shuffled.", "The weight of a feature in the first convolution kernel.", "How long a feature takes to compute."
+"How often a feature occurs in the samples", "The accuracy lost when a feature is shuffled", "A feature's weight in the first convolution", "How long a feature takes to compute"
 6, MultipleChoice, "In Experiment 6, how did the model trained only on the CIC-DDoS2019 sample do on the lab network?", C,
 "Its recall on the lab network was 0 %; the flows it flagged were all benign.",
 "On the lab network its accuracy was about 43 % and its recall 0 %: it caught none of the attacks and flagged some benign flows instead (Experiment 6). A model must be validated on the network it protects.", "",
-"It detected the attacks of the lab network reliably.", "It reached the same accuracy as on its own test split.", "It caught none of the attacks: a model must be validated on the network it protects.", "It flagged every flow of the lab network as an attack."
+"It detected the lab attacks reliably", "It matched its accuracy on its own test split", "It caught none of the lab network's attacks", "It flagged every lab flow as an attack"
 7, MultipleChoice, "The 95 % confidence intervals of two runs overlap. What can you conclude?", D,
 "Overlapping intervals mean the difference may be due to the particular test samples.",
 "When the intervals overlap, the difference between the two runs may come from the particular test samples, so it cannot be claimed with confidence.", "",
-"The run with the higher value is clearly better.", "Both runs are wrong.", "The test split was too large.", "The difference may come from the particular test samples, so it cannot be claimed with confidence."
+"The run with the higher value is better", "The two runs perform equally well", "The two runs used different test samples", "The difference may be due to the samples"
 8, MultipleChoice, "What was blocked in the live test of the post-lab?", A,
 "Each attacker was blocked with an iptables rule after three of its flows had been flagged, a few seconds after its first flow.",
 "Only the two attacker addresses were blocked with iptables rules; the legitimate client kept its access, which is what a good detector should achieve.", "",
-"Only the two attacker addresses; the legitimate client kept its access.", "All three addresses, including the legitimate client.", "Nothing: the detector only raised alerts.", "Only the legitimate client."
+"Only the two attacker addresses", "All three addresses, the client too", "Nothing: the detector only raised alerts", "Only the attacker that started first"
 9, Survey, "How difficult was the lab for you? (not graded)", "",
 "Easy", "About right", "Difficult"
 10, Survey, "What would you improve in this lab? (not graded; press Enter to skip)", ""

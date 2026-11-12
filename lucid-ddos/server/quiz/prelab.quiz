@@ -15,40 +15,40 @@
 1, MultipleChoice, "Why is blocking a single IP address rarely enough to stop a DDoS attack?", A,
 "A DDoS attack is distributed: a botnet sends the traffic from many addresses.",
 "A DDoS attack is distributed: a botnet sends the traffic from many addresses, so blocking one address is rarely enough.", "",
-"The traffic comes from many hosts at the same time (a botnet).", "DDoS traffic is encrypted, so its addresses cannot be read.", "Firewalls cannot block single IP addresses.", "The victim's address changes during the attack."
+"The traffic comes from many hosts at once", "DDoS traffic hides its source with encryption", "Firewalls cannot filter on single addresses", "The victim changes its address during the attack"
 2, MultipleChoice, "What kind of attack is a SYN flood?", B,
 "It fills the server's table of half-open TCP connections.",
 "A SYN flood is a protocol attack that fills the table of half-open TCP connections; the HTTP flood is the application-layer attack.", "",
-"An application-layer attack made of valid HTTP requests.", "A protocol attack: it opens TCP connections and never completes the handshake.", "A reflection attack that amplifies DNS answers.", "An attack that guesses the passwords of a web server."
+"An application-layer flood of valid HTTP requests", "A protocol attack with half-open TCP connections", "A reflection attack that amplifies DNS answers", "A brute-force attack on the server's passwords"
 3, MultipleChoice, "When does LUCID classify the traffic of a flow?", D,
 "An online detector cannot wait for a flow to end; LUCID decides in every time window.",
 "An online detector cannot wait for a flow to end. LUCID collects the traffic in time windows of t = 100 s and decides on the part of each flow seen in the window.", "",
-"Only after the flow has ended.", "Once a day, on all traffic recorded that day.", "Packet by packet, without grouping packets into flows.", "Window by window (t = 100 s), on the part of the flow seen in the window."
+"After each flow has ended, using all its packets", "Once a day, on all of the traffic of that day", "On every single packet, without forming flows", "In every time window, on the packets seen in it"
 4, MultipleChoice, "Which packets belong to the same (bidirectional) flow?", C,
 "Packets are grouped by their 5-tuple in both directions, so a request and its answer are seen together.",
 "Flows are bidirectional: both directions of a conversation are grouped by the same 5-tuple.", "",
-"All packets from the same source address.", "All packets sent within the same second.", "The packets with the same 5-tuple in either direction, so a request and its answer.", "Only the packets from the client to the server."
+"All packets between the same two hosts", "All packets that arrive within the same second", "Packets with the same 5-tuple, either way", "Only the client's packets to the server's port"
 5, MultipleChoice, "Which of these is NOT one of the 11 LUCID packet features?", C,
 "Addresses and ports only group packets into flows; they are not model inputs.",
 "LUCID leaves addresses and ports out on purpose: the 5-tuple only groups packets into flows. Packet length, TCP window size and TCP flags are features.", "",
-"The packet length", "The TCP window size", "The source IP address", "The TCP flags"
+"The packet length", "The TCP window size", "The source address", "The TCP flags"
 6, MultipleChoice, "A model scores 100 % on the test split because it memorised the attacker's IP address. What happens when the attacker uses another address?", B,
 "This is shortcut learning; Experiment 2 will make it visible.",
 "In a recorded dataset the attacker always uses the same address, so memorising it works on the test split but fails on a new address (shortcut learning; you will see it in Experiment 2).", "",
-"It still detects the attack, because its test score was 100 %.", "It fails: it learned a shortcut, not how the attack traffic behaves.", "It retrains itself on the new address.", "It blocks every address it has not seen before."
+"It still detects it, as its test score was 100 %", "It fails: it had learned an address shortcut", "It adapts by retraining itself on the new address", "It blocks every address it has not seen before"
 7, MultipleChoice, "A flow has fewer than n packets. How does it become an n x f sample matrix?", D,
 "Longer flows are cut after n packets; shorter ones are padded with zeros.",
 "The CNN needs a fixed input size: shorter flows are padded with rows of zeros and longer ones are cut after n packets.", "",
-"It is left out of the dataset.", "Its packets are repeated until there are n of them.", "n is made smaller for this flow.", "It is padded with rows of zeros."
+"It is left out of the training data", "Its packets are repeated until there are n", "n is lowered to its number of packets", "It is filled up with rows of zeros"
 8, MultipleChoice, "On which data are the minimum and maximum of the global normalization measured?", A,
 "The scaling is always fitted on the training split only.",
 "The scaling is fitted on the training split only; fitting it on the test data would leak information about the test set into training.", "",
-"The training split only.", "The test split, so that the test data uses the full 0-1 range.", "All splits together.", "The live traffic of the post-lab."
+"On the training split only", "On the test split, to use the full range", "On all splits together", "On the live traffic of the post-lab"
 9, MultipleChoice, "How does the convolution kernel of the LUCID CNN move over a sample?", C,
 "Each kernel covers 3 consecutive packets and all f features.",
 "The kernel is 3 x f: it covers all features and slides only along the packets, so the order of the packets matters.", "",
-"It is 3 x 3 and slides along the packets and the features.", "It covers one packet at a time and ignores the order.", "It is 3 x f: it covers all features and slides only along the packets.", "It does not slide: one kernel covers the whole sample."
+"3 x 3, sliding along packets and features", "1 x f, one packet at a time, order ignored", "3 x f, sliding along the packet axis only", "n x f, one kernel covering the whole sample"
 10, MultipleChoice, "A detector counts the packets of every source address and raises an alarm above a threshold. Which attack does it miss?", B,
 "Spread over many addresses, every single source stays under the per-source limit.",
 "A distributed attack keeps every source under the per-source limit, so the threshold detector misses it (you will test this in Experiment 4).", "",
-"A SYN flood sent by one fast source.", "A botnet that spreads the attack over many addresses, each under the threshold.", "A UDP flood sent by one fast source.", "None: counting packets per source detects every attack."
+"A SYN flood from one very fast source", "A botnet, each bot under the threshold", "An ICMP flood from one host at full speed", "None, if the threshold is set well enough"
