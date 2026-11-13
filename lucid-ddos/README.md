@@ -5,9 +5,11 @@ Every script is responsible for one learning outcome. It writes its output to a 
 parameters. Training and evaluation run single-threaded with seed 42 and deterministic PyTorch.
 
 This folder is a standard Labtainer lab. Students add it once with
-`imodule https://github.com/Berkaybbayramoglu/DDoS_Lab/releases/download/imodule/imodule.tar`
-(built by `../tools/build_imodule.sh`, published by CI) and start it with `labtainer lucid-ddos`;
-the images are pulled from Docker Hub (`REGISTRY berkaybbayramoglu` in `config/start.config`, published by CI).
+`imodule https://github.com/anlam-net/DDoS_Lab/releases/download/imodule/imodule.tar`
+(built by `../tools/build_imodule.sh`, published by CI), get the images with `bin/pull_images.sh`
+(from the Docker Hub repository `anlamnetlab/r2e-cyb-lab`, published by CI, named locally as
+Labtainer expects them with `REGISTRY anlamnetlab` of `config/start.config`) and start it with
+`labtainer lucid-ddos`.
 To work on the lab, copy it into a Labtainer VM with `../tools/push_to_vm.sh` and build it there with
 `rebuild lucid-ddos` (or labedit: Run → Build and run).
 
@@ -21,6 +23,7 @@ To work on the lab, copy it into a Labtainer VM with `../tools/push_to_vm.sh` an
 | `server/_bin/` | `fixlocal.sh` (runs once when the lab is opened: records the start time), `prestop` (runs on `checkwork` and `stoplab`: the progress table) |
 | `server/home_tar/data/` | The lab dataset: `cic_ddos2019_sample.pcap.gz` (the CIC-DDoS2019 sample of the LUCID authors, 7 MB) and `lab_traffic.pcap.gz` (recorded on the lab network, 44 MB compressed, 947 MB uncompressed), with `README.txt` (source, citation) and `LICENSE-lucid-ddos.txt`. tshark reads the files directly. Kept in `home_tar/` so they are not collected as a student artifact |
 | `instr_config/` | Automatic assessment (`gradelab` for the instructor, `checkwork` for the student) |
+| `bin/pull_images.sh` | Runs on the Labtainer VM: pulls the images from `anlamnetlab/r2e-cyb-lab` and names them `anlamnetlab/lucid-ddos.<container>.student` for Labtainer (part of the imodule) |
 | `config/prelab.quiz`, `config/postlab.quiz` | The pre-lab and post-lab quizzes (Labtainer quiz format; `server/quiz/` holds identical copies) |
 | `docs/` | Student manual `lucid-ddos.pdf` (built from the LaTeX source of the manual) and `read_first.txt`, which Labtainer shows when the lab starts, with a link to the manual |
 

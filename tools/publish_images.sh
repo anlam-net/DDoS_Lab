@@ -1,16 +1,17 @@
 #!/bin/bash
-# Publishes the four Labtainer images (built by build_labtainer_images.sh) to Docker Hub under two
-# names each:
-#   <user>/lucid-ddos.<container>.student:latest   the name Labtainer pulls (REGISTRY <user> in
-#                                                  config/start.config), plus :<version> and
-#                                                  :base_image<base id> (as Labtainer's relabel.sh)
-#   <user>/ddos_lab:<container>                    all four in one repository, plus :<container>-<version>
-# Needs a prior `docker login`. Every push is retried (Docker Hub answers 502/503 now and then);
-# a publish that still fails stops with an error, so CI never reports a half-published set as done.
-#   usage: publish_images.sh <docker hub user> [version tag]
+# Publishes the four Labtainer images (built by build_labtainer_images.sh) to the Docker Hub
+# repository <REGISTRY>/r2e-cyb-lab (REGISTRY in config/start.config) as
+#   lucid-ddos.<container>             the current images, plus lucid-ddos.<container>-<version>
+# Labtainer pulls a lab's images only as <REGISTRY>/lucid-ddos.<container>.student; students get
+# them from this one repository with lucid-ddos/bin/pull_images.sh, which gives them that name.
+# Needs a prior `docker login` of a Docker Hub user with write access to the repository. Every push
+# is retried (Docker Hub answers 502/503 now and then); a publish that still fails stops with an
+# error, so CI never reports a half-published set as done.
+#   usage: publish_images.sh [version tag]
 set -eu
-USER_NS=${1:?usage: publish_images.sh <docker hub user> [version tag]}
-VERSION=${2:-}
+VERSION=${1:-}
+REGISTRY=$(awk '$1 == "REGISTRY" {print $2; exit}' "$(dirname "$0")/../lucid-ddos/config/start.config")
+REPO=$REGISTRY/r2e-cyb-lab
 D="docker --context default"
 push() {   # push <tag>, up to 4 attempts
   local n
@@ -23,9 +24,8 @@ push() {   # push <tag>, up to 4 attempts
 }
 for c in server attacker1 attacker2 client; do
   img=lucid-ddos.$c.student
-  base_id=$($D inspect --format '{{index .Config.Labels "base"}}' "$img"); base_id=${base_id##*.}
-  targets="$USER_NS/$img:latest $USER_NS/$img:base_image$base_id $USER_NS/ddos_lab:$c"
-  [ -n "$VERSION" ] && targets="$targets $USER_NS/$img:$VERSION $USER_NS/ddos_lab:$c-$VERSION"
+  targets="$REPO:lucid-ddos.$c"
+  [ -n "$VERSION" ] && targets="$targets $REPO:lucid-ddos.$c-$VERSION"
   for t in $targets; do
     $D tag "$img" "$t"
     push "$t"

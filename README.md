@@ -45,16 +45,20 @@ post-incident report. Labtainer links to it when the lab starts.
 Students, in the `labtainer-student` terminal of a Labtainer VM:
 
 ```bash
-imodule https://github.com/Berkaybbayramoglu/DDoS_Lab/releases/download/imodule/imodule.tar   # once
-labtainer lucid-ddos           # the container images come from Docker Hub
+imodule https://github.com/anlam-net/DDoS_Lab/releases/download/imodule/imodule.tar   # once
+~/labtainer/trunk/labs/lucid-ddos/bin/pull_images.sh   # the container images, from Docker Hub
+labtainer lucid-ddos
 ```
 
-Labtainer does not refresh images it has already downloaded. After a new version was published,
-students get it with:
+The images are in one Docker Hub repository, `anlamnetlab/r2e-cyb-lab`, but Labtainer pulls a
+lab's images only as `<REGISTRY>/lucid-ddos.<container>.student`. `pull_images.sh` downloads them
+and gives them that name (`REGISTRY anlamnetlab` in `config/start.config`); Labtainer then uses
+the local images. It does not refresh them by itself: after a new version was published, students
+get it with:
 
 ```bash
 stoplab lucid-ddos
-for c in server attacker1 attacker2 client; do docker pull berkaybbayramoglu/lucid-ddos.$c.student; done
+~/labtainer/trunk/labs/lucid-ddos/bin/pull_images.sh
 labtainer -r lucid-ddos        # -r: start from fresh containers
 ```
 
@@ -98,20 +102,16 @@ tools/build_lab_dataset.sh     # downloads the CIC-DDoS2019 sample, re-records t
 `.github/workflows/ci.yml` runs on every push and pull request: static checks, the lab pipeline,
 the whole lab sheet against the reference results (and the CPU it ran on), the post-lab, and the
 Labtainer image build with content checks. On `main`, once everything passed,
-it publishes the images to Docker Hub:
+it publishes the images to Docker Hub as `anlamnetlab/r2e-cyb-lab:lucid-ddos.<container>`
+(and `:lucid-ddos.<container>-<commit>`), and the imodule to the GitHub release `imodule`.
 
-| Image | Used by |
-| --- | --- |
-| `berkaybbayramoglu/lucid-ddos.<container>.student:latest` | Labtainer (`REGISTRY berkaybbayramoglu` in `config/start.config`) |
-| `berkaybbayramoglu/ddos_lab:<container>` | the same images in one repository |
-
-Like Labtainer's own `distrib/relabel.sh`, every published image carries the label
-`base=labtainers/labtainer.network3.<id>` (a student's Labtainer refuses an image without it) and is
-also tagged `:base_image<id>`. The id is the base image's config digest, read from Docker Hub by
+Like Labtainer's own `distrib/relabel.sh`, every image carries the label
+`base=labtainers/labtainer.network3.<id>` (Labtainer refuses a pulled image without it). The id is the base image's config digest, read from Docker Hub by
 `tools/base_image_id.py`, so it matches `docker images -q` on the Labtainer VM whatever Docker
 version builds the images.
 
-Publishing needs the repository variable `DOCKERHUB_USERNAME` and the secret `DOCKERHUB_TOKEN`.
+Publishing the images needs the repository variable `DOCKERHUB_USERNAME` and the secret
+`DOCKERHUB_TOKEN` of a Docker Hub user with write access to `anlamnetlab/r2e-cyb-lab`.
 The tools use `docker --context default`.
 
 ## License

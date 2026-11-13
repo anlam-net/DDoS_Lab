@@ -105,9 +105,9 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Publish to Docker Hub
         if: github.ref == 'refs/heads/main' && github.event_name == 'push' && env.DOCKERHUB_USERNAME != ''
-        run: tools/publish_images.sh "$DOCKERHUB_USERNAME" "${GITHUB_SHA::7}"
+        run: tools/publish_images.sh "${GITHUB_SHA::7}"
       - name: Publish the imodule (students run `imodule <release url>`)
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push' && env.DOCKERHUB_USERNAME != ''
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
