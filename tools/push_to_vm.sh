@@ -1,7 +1,7 @@
 #!/bin/bash
 # Copies the lucid-ddos lab of this repository into the Labtainer VM's labs
 # directory, replacing the copy there. The VM must accept SSH, e.g. a VirtualBox NAT rule
-#   VBoxManage controlvm LabtainerVM24 natpf1 "ssh,tcp,127.0.0.1,2222,,22"
+#   VBoxManage controlvm <VM name> natpf1 "ssh,tcp,127.0.0.1,2222,,22"
 # Then, inside the VM:  cd $LABTAINER_DIR/scripts/labtainer-student && rebuild lucid-ddos
 #   usage: push_to_vm.sh [ssh target] [ssh port]
 set -eu
