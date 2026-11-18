@@ -36,7 +36,7 @@ def iso(t):
 
 # (start, end, command, screen output) of the captured runs, seconds after T0
 RUNS = [
-    (40, 61, "python3 quiz.py prelab", "prelab quiz - 9 of 10 correct\n-> results/quiz_prelab.json"),
+    (40, 61, "python3 quiz.py prelab", "prelab quiz - 10 of 11 correct\n-> results/quiz_prelab.json"),
     (150, 160, "python3 check.py --stage window --dir work/01_window", "window stage - 100 % of the rules pass (lab sheet)"),
     (300, 380, "python3 06_train.py --data work/05_shape_global_lucid --model models/global.pt",
      "36858 training samples (both networks), 10 epochs in 76.0 s -> models/global.pt"),
@@ -49,13 +49,13 @@ RUNS = [
     (2780, 2782, "python3 11_incident_report.py --log results/incident_live.csv --victim 172.30.0.10 --attackers 172.30.0.66 172.30.0.67 --out results/incident_report.txt",
      "-> report written to results/incident_report.txt\n   -> 4 of 4 expected results reached (100 %)"),
 ]
-ANSWERS = "".join(f"question {i} answer T - {'WRONG' if i == 8 else 'RIGHT'}\n" for i in range(1, 11))
+ANSWERS = "".join(f"question {i} answer T - {'WRONG' if i == 8 else 'RIGHT'}\n" for i in range(1, 12))
 
 
 def record():
     """The progress record the lab scripts write for RUNS."""
     rec = {"lab_start": iso(T0), "lab_finish": iso(T0 + 2782), "checkpoints": {
-        "prelab_quiz": {"passed": iso(T0 + 61), "attempts": 1, "last_score": 90},
+        "prelab_quiz": {"passed": iso(T0 + 61), "attempts": 1, "last_score": 91},
         "window": {"passed": iso(T0 + 160), "attempts": 1, "last_score": 100},
         "baseline": {"passed": iso(T0 + 402), "attempts": 1},
         "incident": {"passed": iso(T0 + 2782), "attempts": 1, "last_score": 100}},
@@ -107,7 +107,7 @@ def submission(folder, rec, answers=ANSWERS, drop=(), zip_offset=0, gradelab="re
                 member(z, f"results/gradelab/{name}.txt", "".join(f"minute {i}\n" for i in range(1, minutes + 1)), T0 + 2782)
         if answers is not None:
             member(z, "results/quiz_prelab.txt", answers, T0 + 61)
-            member(z, "results/quiz_prelab.json", json.dumps({"attempts": [{"correct": 9}]}), T0 + 61)
+            member(z, "results/quiz_prelab.json", json.dumps({"attempts": [{"correct": 10}]}), T0 + 61)
     path = os.path.join(folder, f"{STUDENT}.lucid-ddos.lab")
     with zipfile.ZipFile(path, "w") as outer:
         outer.writestr(f"{STUDENT}.lucid-ddos=lucid-ddos.server.student.zip", buf.getvalue())
@@ -150,7 +150,7 @@ def main():
     cases.append(("live detection shortened", dict(rec=consistent(r)), "not found in Labtainer's capture"))
     r = record(); r["checkpoints"]["window"]["minutes"] = 0
     cases.append(("minutes edited", dict(rec=r), "minutes 0 do not match"))
-    cases += [("quiz answer corrected", dict(rec=record(), answers=ANSWERS.replace("WRONG", "RIGHT")), "graded 10/10"),
+    cases += [("quiz answer corrected", dict(rec=record(), answers=ANSWERS.replace("WRONG", "RIGHT")), "graded 11/11"),
               ("quiz file deleted", dict(rec=record(), answers=None), "quiz_prelab.txt is missing"),
               ("record deleted", dict(rec=None), "no results/time_result.json"),
               ("record damaged", dict(rec="{ not json"), "no results/time_result.json"),

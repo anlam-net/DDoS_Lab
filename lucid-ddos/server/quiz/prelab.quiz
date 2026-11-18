@@ -52,3 +52,7 @@
 "Spread over many addresses, every single source stays under the per-source limit.",
 "A distributed attack keeps every source under the per-source limit, so the threshold detector misses it (you will test this in Experiment 4).", "",
 "A SYN flood from one very fast source", "A botnet, each bot under the threshold", "An ICMP flood from one host at full speed", "None, if the threshold is set well enough"
+11, MultipleChoice, "Besides making a service unavailable, which of these is also an effect of a DDoS attack?", D,
+"A DDoS attack can keep the security team busy while another attack, such as a data theft, takes place.",
+"A DDoS attack overloads a service; by itself it does not delete data, infect users or steal passwords. It can, however, keep the security team busy while another attack, such as a data theft, takes place (Section 1.2).", "",
+"It permanently deletes the data on the server", "It infects every user who visits the server", "It reveals the server's passwords to the attacker", "It can cover another attack, e.g. a data theft"

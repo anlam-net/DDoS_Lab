@@ -10,6 +10,12 @@ dependencies, so it is safe to import anywhere):
   inference      start, end and duration of every 07_infer.py and 10_detect_block.py run
   lab_finish     the first time the last script of the lab, 11_incident_report.py, completed (not the
                  time the lab was stopped); lab_minutes = lab_finish - lab_start
+  environment    the lab version and the computer, recorded with the first entry: lab_version (the commit
+                 the published images were built from, .local/lab_version.txt), lab_files (a fingerprint of the
+                 lab scripts and quizzes), the processor, the CPUs the lab may use, the memory of the VM,
+                 AVX2/AVX-512, Python and PyTorch versions. Times depend on the computer, and records of
+                 different lab versions are not comparable; environment_changes lists every later
+                 difference (e.g. more CPUs given to the VM, or changed lab scripts) with its time.
 The file goes to the instructor with the student's work (stoplab); tools/time_report.py collects
 the files of a whole class into one table. Four of the times also appear in gradelab's report
 (results/gradelab/*.txt, one line per minute): lab_minutes, dataset_min (Steps 1-5 passed),
@@ -20,8 +26,11 @@ Students see their progress at any time:
 Writing the record never stops a lab script: if the file cannot be written, a warning is printed.
 """
 import fcntl
+import glob
+import hashlib
 import json
 import os
+import platform
 import sys
 import time
 from datetime import datetime, timezone
@@ -112,7 +121,7 @@ def _dump(rec):
     """JSON with one line per checkpoint and per run (the grader's results.config reads single lines)."""
     out = ["{"]
     for key in ("lab_start", "lab_finish", "lab_minutes", "training_runs", "training_seconds",
-                "inference_runs", "inference_seconds"):
+                "inference_runs", "inference_seconds", "environment", "environment_changes"):
         if key in rec:
             out.append(f" {json.dumps(key)}: {json.dumps(rec[key])},")
     cps = rec.get("checkpoints", {})
@@ -136,6 +145,7 @@ def _update(change):
         with open(LOCK_FILE, "a") as lock:
             fcntl.flock(lock, fcntl.LOCK_EX)
             rec = load()
+            _note_environment(rec)
             change(rec)
             for kind in ("training", "inference"):
                 runs = rec.get(kind, [])
@@ -175,6 +185,69 @@ def _write_gradelab(rec):
             fh.write("".join(f"minute {i}\n" for i in range(1, minutes + 1)))
         paths.append(path)
     _give_back(*paths)
+
+
+def environment():
+    """The lab version and the computer the lab runs on (never raises; unknown parts are left out)."""
+    env = {}
+    try:
+        with open(os.path.join(HOME, ".local", "lab_version.txt")) as fh:
+            env["lab_version"] = fh.read().strip()
+    except OSError:
+        env["lab_version"] = "local build"
+    try:
+        files = sorted(glob.glob(os.path.join(HOME, "[0-9][0-9]_*.py")) + glob.glob(os.path.join(HOME, "[0-9][0-9]_*.sh"))
+                       + [os.path.join(HOME, f) for f in ("check.py", "lablib.py", "progress.py", "quiz.py")]
+                       + glob.glob(os.path.join(HOME, "quiz", "*.quiz")))
+        h = hashlib.sha256()
+        for f in files:
+            with open(f, "rb") as fh:
+                h.update(os.path.relpath(f, HOME).encode() + b"\0" + fh.read())
+        env["lab_files"] = h.hexdigest()[:12]
+    except OSError:
+        pass
+    try:
+        with open("/proc/cpuinfo") as fh:
+            info = fh.read()
+        model = next((l.split(":", 1)[1].strip() for l in info.splitlines() if l.startswith("model name")), None)
+        flags = next((l.split(":", 1)[1].split() for l in info.splitlines() if l.startswith("flags")), [])
+        if model:
+            env["cpu"] = model
+        env["avx2"] = "avx2" in flags
+        env["avx512"] = "avx512f" in flags
+    except OSError:
+        pass
+    try:
+        env["cpus"] = len(os.sched_getaffinity(0))          # the CPUs the lab may use (NUM_CPUS)
+    except (AttributeError, OSError):
+        env["cpus"] = os.cpu_count()
+    try:
+        with open("/proc/meminfo") as fh:
+            kb = next(int(l.split()[1]) for l in fh if l.startswith("MemTotal:"))
+        env["memory_mb"] = kb // 1024
+    except (OSError, StopIteration, ValueError):
+        pass
+    env["python"] = platform.python_version()
+    try:
+        from importlib.metadata import version
+        env["torch"] = version("torch")
+    except Exception:
+        pass
+    return env
+
+
+def _note_environment(rec):
+    """The first entry records the environment; a later difference is added to environment_changes."""
+    try:
+        env = environment()
+    except Exception:
+        return
+    if "environment" not in rec:
+        rec["environment"] = dict(env, at=stamp(now()))
+        return
+    last = rec["environment_changes"][-1] if rec.get("environment_changes") else rec["environment"]
+    if {k: v for k, v in last.items() if k != "at"} != env:
+        rec.setdefault("environment_changes", []).append(dict(env, at=stamp(now())))
 
 
 def _give_back(*paths):

@@ -60,6 +60,12 @@ for c in $containers; do
   (cd "$LAB/$c" && tar cf - --exclude=./_bin --exclude=./_system --exclude=./home_tar --exclude=./sys_tar \
        --exclude='*.tar' --exclude='*.tar.gz' --exclude=./work --exclude=./models --exclude=./results \
        --exclude=./replay --exclude=./data --exclude=__pycache__ .) | tar xf - -C "$home"
+  # the lab version for the progress record (progress.environment): commit and its date
+  if [ "$c" = server ] && git -C "$LAB" rev-parse --git-dir >/dev/null 2>&1; then
+    v="$(git -C "$LAB" log -1 --format='%h %cs')"
+    git -C "$LAB" diff --quiet HEAD -- . 2>/dev/null || v="$v (with uncommitted changes)"
+    echo "$v" > "$home/.local/lab_version.txt"
+  fi
   mkdir -p "$LAB/$c/_system"
   (cd "$LAB/$c/_system" && tar $OWNER -czvf "$ctx/sys_$img.tar.gz" . > "$home/.local/sys_manifest.list")
   (cd "$home" && tar $OWNER -czf "$ctx/$img.tar.gz" .)

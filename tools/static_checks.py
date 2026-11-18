@@ -111,7 +111,7 @@ for q in ("prelab", "postlab"):
     ids = [i["id"] for i in items if i["type"] != "preface"]
     check(f"quiz {q}: unique question IDs, no blank lines (the quiz module stops at a blank line)",
           len(ids) == len(set(ids)) and all(line.strip() for line in open(cfg)))
-    want = {"prelab": 10, "postlab": 8}[q]               # the counts in goals.config and in the manuals
+    want = {"prelab": 11, "postlab": 8}[q]               # the counts in goals.config and in the manuals
     check(f"quiz {q}: {want} graded questions", len(graded) == want, str(len(graded)))
 
 # dataset

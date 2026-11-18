@@ -268,7 +268,7 @@ typed line starts with it; a lab script started inside a loop, after `;`, with `
 
 | Goal | Source |
 | --- | --- |
-| `prelab_quiz`, `postlab_quiz` | Correct answers in the first attempt of `quiz.py prelab` (10 questions) / `quiz.py postlab` (8) |
+| `prelab_quiz`, `postlab_quiz` | Correct answers in the first attempt of `quiz.py prelab` (11 questions) / `quiz.py postlab` (8) |
 | `lab_minutes`, `dataset_min`, `results_min`, `training_min` | Minutes from opening the lab to its end, to the end of Steps 1-5, to all runs matching the reference; minutes of all trainings (`results/gradelab/*.txt`, one line per minute, written by `progress.py`) |
 | `window_check` … `shape_check` | `check.py` stdout contains "`<stage> stage - 100 % of the rules pass (lab sheet)`": the folder of the lab sheet (`work/01_window` … `work/05_shape_global_lucid`) made with the settings of the lab sheet; a check of another folder is not counted, and a lab-sheet folder made with other settings (e.g. `-n 10`) gets a warning that names the wrong option |
 | `baseline_match` | Steps 6–8: the run `global` matches the reference |
@@ -294,13 +294,15 @@ scripts write through `progress.py`:
 | `lab_finish`, `lab_minutes` | The first completion of `11_incident_report.py`, the last script of the lab. The end is triggered by the last script, not by `stoplab`, which may come much later |
 | `checkpoints` | Each checkpoint: the first time it was passed (`passed`, `minutes` after `lab_start`), `attempts` and `last_score`. Written by `check.py`, `08_evaluate.py`, `09_plot.py`, `15_explain.py`, `11_incident_report.py`, `quiz.py` |
 | `training`, `inference` | Start, end and seconds of every `06_train.py` and of every `07_infer.py` / `10_detect_block.py` run, with model and data |
+| `environment`, `environment_changes` | With the first entry: the lab version (`.local/lab_version.txt`, the commit `build_labtainer_images.sh` built the images from; `local build` otherwise), a fingerprint of the lab scripts and quizzes (`lab_files`), the processor, the CPUs the lab may use, the memory, AVX2/AVX-512, Python and PyTorch. Every later difference (e.g. more CPUs for the VM, changed scripts) is added to `environment_changes` with its time. Times depend on the computer, and records of different lab versions are not comparable |
 
 Labtainer's report shows only `Y`/`N` and whole numbers: `progress.py` therefore also writes the four
 times above as files of one line per minute, which `results.config` counts (`LINE_COUNT`). All times
 (every checkpoint, every run) are collected separately:
 `../tools/time_report.py <folder with the submissions> --out times.csv --runs runs.csv` reads
 `results/time_result.json` and the quiz answers of every submitted archive and writes one row per
-student (start, end, minutes per checkpoint, attempts, quiz scores, training and inference time).
+student (start, end, minutes per checkpoint, attempts, quiz scores, training and inference time, lab
+version and computer; it warns when the submissions come from different lab versions).
 
 `results/time_result.json` lies in the student's home directory and could be edited. `time_report.py`
 therefore cross-checks it (`../tools/capture_check.py`) against what Labtainer records by itself: every
@@ -330,7 +332,7 @@ terminal reads the same files with the same rules and is the graded path: its fi
 `prelab_quiz` / `postlab_quiz` columns of `gradelab`, the checkpoints and the time record. To change a
 quiz, edit `config/<quiz>.quiz` and copy it to `server/quiz/`; the static checks require both to be
 identical, every graded question to have both responses and an answer among its options, unique IDs,
-no blank lines (the module stops at one) and 10 / 8 graded questions (the counts in `goals.config` and
+no blank lines (the module stops at one) and 11 / 8 graded questions (the counts in `goals.config` and
 the manuals).
 
 ## labedit

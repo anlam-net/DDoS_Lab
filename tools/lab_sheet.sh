@@ -100,7 +100,7 @@ want = ["prelab_quiz", "window", "flows", "normalize", "features", "shape", "bas
 checks = [(f"checkpoint {c} passed", "passed" in cps.get(c, {}) and "minutes" in cps[c]) for c in want]
 checks += [("training runs timed (one per 06_train.py)", rec["training_runs"] == log.count("### python3 06_train.py")),
            ("inference runs timed (one per 07_infer.py)", rec["inference_runs"] == log.count("### python3 07_infer.py")),
-           ("pre-lab quiz graded 10 of 10", open(sys.argv[2]).read().count("- RIGHT") == 10),
+           ("pre-lab quiz graded 11 of 11", open(sys.argv[2]).read().count("- RIGHT") == 11),
            ("lab not finished before the post-lab", "lab_finish" not in rec)]
 # the minutes gradelab shows: one line per minute in results/gradelab/<name>.txt
 import os

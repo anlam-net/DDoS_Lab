@@ -1,7 +1,8 @@
 #!/bin/bash
 # Checks the contents of the four Labtainer images built by build_labtainer_images.sh (or by
 # Labtainer itself) without starting the lab:
-#   server     lab scripts, dataset, Python packages, seed and tools in place; a lab script runs
+#   server     lab scripts, dataset, Python packages, seed and tools in place; a lab script runs;
+#              the lab version and environment of the progress record
 #   traffic    replay_attack.sh, tcpreplay and hping3 in place
 #   all        lab user with passwordless sudo, no SSH key shipped in the home directory
 #   usage: smoke_labtainer_images.sh      (exit code 0 = all checks passed)
@@ -24,6 +25,8 @@ check "server: model is a 2D CNN with 2241 parameters" $S ubuntu \
 check "server: tshark reads the dataset" $S ubuntu \
   'for f in data/lab_traffic.pcap.gz data/cic_ddos2019_sample.pcap.gz; do tshark -r $f -c 5 -T fields -e frame.number | wc -l | grep -qx 5 || exit 1; done'
 check "server: iptables, ssh client, feh" $S root 'which iptables ssh ssh-keygen ssh-copy-id feh >/dev/null'
+check "server: lab version and environment for the progress record" $S ubuntu \
+  'test -s .local/lab_version.txt && python3 -c "import progress; e = progress.environment(); print(e); assert e[\"lab_version\"] != \"local build\" and e[\"lab_files\"] and e[\"cpus\"] and e[\"torch\"].startswith(\"2.6\")"'
 for c in attacker1 attacker2 client; do
   check "$c: replay_attack.sh, tcpreplay, hping3, sshd" lucid-ddos.$c.student ubuntu \
     'test -x replay_attack.sh && which tcpreplay tcprewrite hping3 >/dev/null && test -x /usr/sbin/sshd'

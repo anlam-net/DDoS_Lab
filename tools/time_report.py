@@ -10,6 +10,10 @@ tool reads them all and writes one row per student:
                                          (empty: not passed); <checkpoint>_tries: attempts
   prelab_quiz, postlab_quiz              correct answers / questions in the first attempt
   training_*, inference_*                number of runs and total seconds
+  lab_version, lab_files, cpu, cpus,     the lab version and the computer, recorded when the lab was
+  memory_mb, avx2, avx512, python, torch first opened (times depend on the computer; records of
+  environment_changes                    different lab versions are not comparable); environment_changes:
+                                         how often they changed later (e.g. more CPUs for the VM)
   verified, issues                       the record cross-checked against Labtainer's own capture of
                                          every command (capture_check.py): "yes", or "NO" with the
                                          problems found; lab_*_capture: the times from the capture alone
@@ -67,6 +71,9 @@ def quiz_score(text):
     return f"{sum(l.endswith('- RIGHT') for l in lines)}/{len(lines)}"
 
 
+ENV_KEYS = ("lab_version", "lab_files", "cpu", "cpus", "memory_mb", "avx2", "avx512", "python", "torch")
+
+
 def main():
     a = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     a.add_argument("folder", help="folder with the submissions (*.lab), e.g. ~/labtainer_xfer/lucid-ddos")
@@ -80,8 +87,9 @@ def main():
             "checkpoints_passed"]
     for name in progress.NAMES:
         head += [f"{name}_min", f"{name}_tries"]
-    head += ["training_runs", "training_seconds", "inference_runs", "inference_seconds",
-             "verified", "lab_start_capture", "lab_finish_capture", "lab_minutes_capture", "issues"]
+    head += ["training_runs", "training_seconds", "inference_runs", "inference_seconds"]
+    head += list(ENV_KEYS) + ["environment_changes"]
+    head += ["verified", "lab_start_capture", "lab_finish_capture", "lab_minutes_capture", "issues"]
     rows, runs = [], []
     for path in archives:
         student = os.path.basename(path).split(".lucid-ddos")[0]
@@ -109,6 +117,10 @@ def main():
             row[f"{kind}_runs"] = rec.get(f"{kind}_runs", "")
             row[f"{kind}_seconds"] = rec.get(f"{kind}_seconds", "")
             runs += [{"student": student, "kind": kind, **r} for r in rec.get(kind, [])]
+        env = rec.get("environment", {})
+        for k in ENV_KEYS:
+            row[k] = env.get(k, "")
+        row["environment_changes"] = len(rec.get("environment_changes", []))
         try:
             issues, derived = capture_check.check(rec, captured, seed, files)
         except (KeyError, ValueError, TypeError) as e:       # a damaged record
@@ -122,6 +134,11 @@ def main():
             print(f"{student}: {i}", file=sys.stderr)
         rows.append(row)
 
+    versions = {(r["lab_version"], r["lab_files"]) for r in rows if r["lab_version"] or r["lab_files"]}
+    if len(versions) > 1:
+        print(f"note: the submissions come from {len(versions)} different lab versions "
+              f"(lab_version, lab_files): {sorted(versions)}; their times are not directly comparable",
+              file=sys.stderr)
     with open(args.out, "w", newline="") as fh:
         w = csv.DictWriter(fh, head)
         w.writeheader()
