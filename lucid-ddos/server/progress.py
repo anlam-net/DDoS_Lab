@@ -12,7 +12,7 @@ dependencies, so it is safe to import anywhere):
                  time the lab was stopped); lab_minutes = lab_finish - lab_start
   environment    the lab version and the computer, recorded with the first entry: lab_version (the commit
                  the published images were built from, .local/lab_version.txt), lab_files (a fingerprint of the
-                 lab scripts and quizzes), the processor, the CPUs the lab may use, the memory of the VM,
+                 lab scripts and quizzes), the processor, the number of CPUs of the VM, the memory of the VM,
                  AVX2/AVX-512, Python and PyTorch versions. Times depend on the computer, and records of
                  different lab versions are not comparable; environment_changes lists every later
                  difference (e.g. more CPUs given to the VM, or changed lab scripts) with its time.
@@ -218,7 +218,7 @@ def environment():
     except OSError:
         pass
     try:
-        env["cpus"] = len(os.sched_getaffinity(0))          # the CPUs the lab may use (NUM_CPUS)
+        env["cpus"] = len(os.sched_getaffinity(0))          # CPUs of the VM (NUM_CPUS is a time quota on top)
     except (AttributeError, OSError):
         env["cpus"] = os.cpu_count()
     try:
