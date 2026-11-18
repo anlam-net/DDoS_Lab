@@ -38,7 +38,7 @@
 "It detected the lab attacks reliably", "It matched its accuracy on its own test split", "It caught none of the lab network's attacks", "It flagged every lab flow as an attack"
 7, MultipleChoice, "The 95 % confidence intervals of two runs overlap. What can you conclude?", D,
 "Overlapping intervals mean the difference may be due to the particular test samples.",
-"When the intervals overlap, the difference between the two runs may come from the particular test samples, so it cannot be claimed with confidence.", "",
+"When the intervals overlap, the difference between the two runs may come from the particular test samples, so it cannot be claimed from the intervals alone.", "",
 "The run with the higher value is better", "The two runs perform equally well", "The two runs used different test samples", "The difference may be due to the samples"
 8, MultipleChoice, "What was blocked in the live test of the post-lab?", A,
 "Each attacker was blocked with an iptables rule after three of its flows had been flagged, a few seconds after its first flow.",

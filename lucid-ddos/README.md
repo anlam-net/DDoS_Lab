@@ -134,7 +134,7 @@ shows in the training loss, see below); shaping n = 3 79.3 % · n = 10 / 50 / 10
 Feature selection (lab network, accuracy, test → test_newaddr): `lucid` 100 % → 100 % · `lucid_ids`
 100 % → 40.4 % · `ids_only` 100 % → 1.8 %. On the normal test split all three look perfect; once the
 addresses change, only the address-free LUCID features hold up (shortcut learning). The experiment runs
-on the lab network because, with one min-max scaling for both networks (172.16.x to 192.168.x), the
+on the lab network because, with one min-max scaling for both networks (whose addresses span almost the whole IPv4 range), the
 addresses of one /24 differ by less than 10^-6 after scaling and the shortcut cannot be seen; the
 address swap stays inside each network.
 
@@ -147,8 +147,9 @@ FPR, see the sweep in Figure 4b). LUCID judges each flow without addresses, so i
 
 Explanation (`15_explain.py`): the LUCID model relies on tcp_win, highest_layer and tcp_len (accuracy
 drop 9–15 points each when shuffled); the lucid_ids model relies only on src_ip (38 points); the
-n = 3 model misses 943 of the 950 attack flows longer than 10 packets (HTTP floods), whose first 3
-packets look like benign HTTP.
+n = 3 model makes 943 errors among the flows longer than 10 packets: it misses 941 of the 950 attack
+flows there (all HTTP-flood flows of the lab network, whose first 3 packets look like benign HTTP; the 9
+it catches come from the CIC sample), and 2 errors are false alarms.
 
 Training on another network (accuracy, tested on CIC sample / lab network): trained on the CIC
 sample only 99.8 % / 42.8 % (no lab attack found) · on the lab network only 54.6 % / 100 % · on both
@@ -158,7 +159,8 @@ trains on both, and the post-lab defends the lab network.
 ## Post-lab (server + attacker1 + attacker2 + client)
 
 The validation split is not used for training (the number of epochs is fixed from the paper).
-Instead it is used to simulate an attack with traffic never seen in training: the student's own
+Instead it is used to simulate an attack with traffic never seen in training (from the same recording,
+so it shows the model works on the lab network, not that it generalises; Experiment 6 tests that): the student's own
 model detects and blocks it live, and the student writes a post-incident report.
 
 | Order | Script | Job |
